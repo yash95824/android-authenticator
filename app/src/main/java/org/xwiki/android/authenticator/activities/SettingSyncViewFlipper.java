@@ -78,7 +78,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     @Override
     public void doNext() {
-        syncSettingComplete();
+        String test = null;
+        test.substring(1);
+        //syncSettingComplete();
         mActivity.finish();
         //mActivity.checkPermissions();
     }

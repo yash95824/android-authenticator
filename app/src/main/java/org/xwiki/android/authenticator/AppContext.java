@@ -22,6 +22,11 @@ package org.xwiki.android.authenticator;
 import android.app.Application;
 import android.util.Log;
 
+import com.google.android.gms.analytics.ExceptionReporter;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+
+import org.xwiki.android.authenticator.utils.CrashHandler;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.ArrayList;
@@ -34,16 +39,46 @@ public class AppContext extends Application {
     private static final String TAG = "AppContext";
 
     private static AppContext instance;
-
-    public static AppContext getInstance() {
-        return instance;
-    }
+    //google analytics
+    private Tracker mTracker;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
         Log.d(TAG, "on create");
+
+        //init google analytics tracker
+        mTracker = getDefaultTracker();
+        CrashHandler crashHandler = CrashHandler.getInstance();
+        crashHandler.init(this);
+        /*
+        Thread.UncaughtExceptionHandler myHandler = new ExceptionReporter(
+                mTracker,
+                Thread.getDefaultUncaughtExceptionHandler(),
+                this);
+        Thread.setDefaultUncaughtExceptionHandler(myHandler);
+        */
+    }
+
+    public static AppContext getInstance() {
+        if(instance == null){
+            instance = new AppContext();
+        }
+        return instance;
+    }
+
+    /**
+     * Gets the default {@link Tracker} for this {@link Application}.
+     * @return tracker
+     */
+    synchronized public Tracker getDefaultTracker() {
+        if (mTracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+            mTracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return mTracker;
     }
 
     public static void addAuthorizedApp(int uid, String packageName) {

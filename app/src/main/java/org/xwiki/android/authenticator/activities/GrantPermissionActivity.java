@@ -35,6 +35,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.AnalyticsTrackers;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
@@ -46,6 +47,7 @@ import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
  * or sending password to server to verify according the response.
  */
 public class GrantPermissionActivity extends AccountAuthenticatorActivity {
+    private static final String TAG = "GrantPermissionActivity";
 
     // UI references.
     private String authTokenType = null;
@@ -81,7 +83,11 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
         ((TextView) findViewById(R.id.accountName)).setText(accountName);
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnalyticsTrackers.trackScreenView(TAG);
+    }
 
     public void onCancel(View view){
         finish();
