@@ -321,10 +321,23 @@ public class XWikiHttp {
     private static SyncData getSyncGroups(List<String> groupIdList, String lastSyncTime) throws IOException, XmlPullParserException {
         if (groupIdList == null || groupIdList.size() == 0) return null;
         SyncData syncData = new SyncData();
+        Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
         for (String groupId : groupIdList) {
             String[] split = XWikiUser.splitId(groupId);
             if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
-            String url = getServerRestUrl() + "/wikis/" + split[0] + "/spaces/" + split[1] + "/pages/" + split[2] + "/objects/XWiki.XWikiGroups";
+            String url = getServerRestUrl() + "/wikis/xwiki/query?q=" +
+                    ",%20BaseObject%20as%20userObj%20,%20XWikiDocument%20as%20groupDoc%20,%20BaseObject%20as%20groupObj%20,%20com.xpn.xwiki.objects.StringProperty%20as%20groupObj_member1%20" +
+                    "where%20(%20groupObj_member1.value%20=%20doc.fullName%20and%20groupDoc.fullName%20=%20%27XWiki." + split[2] + "%27%20)%20" +
+                    "and%20doc.fullName=userObj.name%20and%20userObj.className=%27XWiki.XWikiUsers%27%20" +
+                    "and%20groupDoc.fullName=groupObj.name%20and%20groupObj.className=%27XWiki.XWikiGroups%27%20" +
+                    "and%20groupObj_member1.id.id=groupObj.id%20and%20groupObj_member1.id.name=%27member%27%20&type=hql";
+
+//            String url = getServerRestUrl() + "/wikis/xwiki/query?q=" +
+//                    ", BaseObject as userObj , XWikiDocument as groupDoc , BaseObject as groupObj , com.xpn.xwiki.objects.StringProperty as groupObj_member1 " +
+//                    "where ( groupObj_member1.value = doc.fullName and groupDoc.fullName = 'XWiki."+ split[2] + "' ) " +
+//                    "and doc.fullName=userObj.name and userObj.className='XWiki.XWikiUsers' " +
+//                    "and groupDoc.fullName=groupObj.name and groupObj.className='XWiki.XWikiGroups' " +
+//                    "and groupObj_member1.id.id=groupObj.id and groupObj_member1.id.name='member' &type=hql";
             HttpRequest request = new HttpRequest(url);
             HttpExecutor httpExecutor = new HttpExecutor();
             HttpResponse response = httpExecutor.performRequest(request);
@@ -332,19 +345,16 @@ public class XWikiHttp {
             if (statusCode < 200 || statusCode > 299) {
                 throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
             }
-            Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
+            List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
+            Log.i(TAG, searchList.size() +",content="+searchList.toString());
             Date itemDate = null;
-            List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
-            for (ObjectSummary item : objectList) {
-                //TODO ask why this situation occur? <headline>xwiki:XWiki.gdelhumeau</headline>
-                if (!item.headline.contains(":")) {
-                    item.headline = split[0] + ":" + item.headline;
-                }
-                syncData.allIdSet.add(item.headline);
-                itemDate = getUserLastModified(item.headline);
-                if (itemDate == null || itemDate.before(lastSynDate)) continue;
-                XWikiUser user = getUserDetail(item.headline);
+            for (SearchResult item : searchList) {
+                syncData.allIdSet.add(item.id);
+                itemDate = StringUtils.iso8601ToDate(item.modified);
+                if (itemDate.before(lastSynDate)) continue;
+                XWikiUser user = getUserDetail(item.id);
                 if(user != null) {
+                    user.lastModifiedDate = item.modified;
                     syncData.updateUserList.add(user);
                 }
                 // if many users should be synchronized, the task will not be stop
@@ -359,19 +369,27 @@ public class XWikiHttp {
         return syncData;
     }
 
+
+
     /**
      * getSyncAllUsers
      * Constants.SYNC_TYPE_ALL_USERS
      * used for getting the all users from server.
      *
-     * @param lastSyncTime the last sync time.
+     * @param lastSyncTime
+     *             the last sync time. 2016-06-19T02:49:25Z    (UTC time)
      * @return SyncData
-     * the SyncData can be used in updating the data.
+     *             the SyncData can be used in updating the data.
      * @throws IOException
      * @throws XmlPullParserException
      */
     private static SyncData getSyncAllUsers(String lastSyncTime) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
+       String url = getServerRestUrl() + "/wikis/query?q=" +
+               "wiki:xwiki%20and%20object:XWiki.XWikiUsers%20and%20date:[" +
+               lastSyncTime +
+               "%20TO%20*]&number=" +
+               Constants.LIMIT_MAX_SYNC_USERS;
+
         HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
@@ -379,12 +397,8 @@ public class XWikiHttp {
         }
         List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
         SyncData syncData = new SyncData();
-        Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
-        Date itemDate = null;
         for (SearchResult item : searchList) {
             syncData.allIdSet.add(item.id);
-            itemDate = StringUtils.iso8601ToDate(item.modified);
-            if (itemDate.before(lastSynDate)) continue;
             XWikiUser user = getUserDetail(item.id);
             if(user != null) {
                 user.lastModifiedDate = item.modified;
