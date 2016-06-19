@@ -52,6 +52,7 @@ import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.AnalyticsTrackers;
 import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
@@ -135,6 +136,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnalyticsTrackers.trackScreenView(TAG);
+        //AnalyticsTrackers.trackEvent("test Category", "test Action", "test Label");
+    }
 
     @Override
     protected void onDestroy() {

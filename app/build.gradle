@@ -1,6 +1,7 @@
 // just for installing automatically sdk with com.github.JakeWharton
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
@@ -30,6 +31,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     //compile 'com.android.support:design:23.1.1'
     //compile 'com.android.support:support-v4:23.1.1'
+
+    //error report using google analytics
+    compile 'com.google.android.gms:play-services-analytics:9.0.0'
+    //error report acra
+    //compile 'ch.acra:acra:4.8.5'
 
     // For getting the from token in the process of sign up
     compile 'org.jsoup:jsoup:1.9.1'

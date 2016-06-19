@@ -50,6 +50,7 @@ import org.xwiki.android.authenticator.contactdb.BatchOperation;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.AnalyticsTrackers;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
@@ -104,6 +105,12 @@ public class EditContactActivity extends AppCompatActivity {
             mCellPhoneView.setText(wikiUser.getPhone());
             mLastNameView.setText(wikiUser.getLastName());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnalyticsTrackers.trackScreenView(TAG);
     }
 
     @Override

@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "175385555646",
+    "project_id": "android-authenticator"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175385555646:android:d9fc27d15ea1fbae",
+        "android_client_info": {
+          "package_name": "org.xwiki.android.authenticator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiBfGcyCnQRh4UMJlKp-c1bXapDRMl0oc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-79084705-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
