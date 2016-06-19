@@ -71,6 +71,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler{
         String exceptionInfo = collectException(ex);
         String standardInfo = new StandardExceptionParser(mContext, null).getDescription(Thread.currentThread().getName(), ex);
         //AnalyticsTrackers.trackScreenView(result.substring(0, (result.length() > 2048 ? 2040 : result.length())));
+        Log.e(TAG, deviceInfo + exceptionInfo, ex);
         AnalyticsTrackers.trackEvent(standardInfo, deviceInfo, exceptionInfo);
         return true;
     }
@@ -107,7 +108,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler{
             try {
                 field.setAccessible(true);
                 infos.put(field.getName(), field.get(null).toString());
-                Log.d(TAG, field.getName() + " : " + field.get(null));
+                //Log.d(TAG, field.getName() + " : " + field.get(null));
             } catch (Exception e) {
                 Log.e(TAG, "an error occured when collect crash info", e);
             }

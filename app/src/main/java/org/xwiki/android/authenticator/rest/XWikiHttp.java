@@ -337,16 +337,16 @@ public class XWikiHttp {
             List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
             for (ObjectSummary item : objectList) {
                 //TODO ask why this situation occur? <headline>xwiki:XWiki.gdelhumeau</headline>
-                if (item.headline.startsWith(split[0])) {
-                    item.headline = item.headline.substring(split[0].length() + 1);
+                if (!item.headline.contains(":")) {
+                    item.headline = split[0] + ":" + item.headline;
                 }
-                syncData.allIdSet.add(split[0] + ":" + item.headline);
-                itemDate = getUserLastModified(split[0], item.headline);
+                syncData.allIdSet.add(item.headline);
+                itemDate = getUserLastModified(item.headline);
                 if (itemDate == null || itemDate.before(lastSynDate)) continue;
-                String[] spaceAndName = item.headline.split("\\.");
-                XWikiUser user = getUserDetail(split[0], spaceAndName[0], spaceAndName[1]);
-                syncData.updateUserList.add(user);
-
+                XWikiUser user = getUserDetail(item.headline);
+                if(user != null) {
+                    syncData.updateUserList.add(user);
+                }
                 // if many users should be synchronized, the task will not be stop
                 // even though you close the sync in settings or selecting the "don't sync" option.
                 // we should stop the task by checking the sync type each time.
@@ -386,9 +386,10 @@ public class XWikiHttp {
             itemDate = StringUtils.iso8601ToDate(item.modified);
             if (itemDate.before(lastSynDate)) continue;
             XWikiUser user = getUserDetail(item.id);
-            user.lastModifiedDate = item.modified;
-            syncData.updateUserList.add(user);
-
+            if(user != null) {
+                user.lastModifiedDate = item.modified;
+                syncData.updateUserList.add(user);
+            }
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
@@ -428,11 +429,11 @@ public class XWikiHttp {
      * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/zhouwenhai
      *                     http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers%20and%20name:fitz
      */
-    private static Date getUserLastModified(String wiki, String id) throws IOException, XmlPullParserException {
-        String[] split = id.split("\\.");
+    private static Date getUserLastModified(String id) throws IOException, XmlPullParserException {
+        String[] split = XWikiUser.splitId(id);
         if (split == null)
             throw new IOException(TAG + ",in getUserLastModified, groupId error" + id);
-        String url = getServerRestUrl() + "/wikis/" + wiki + "/spaces/" + split[0] + "/pages/" + split[1];
+        String url = getServerRestUrl() + "/wikis/" + split[0] + "/spaces/" + split[1] + "/pages/" + split[2];
         HttpRequest request = new HttpRequest(url);
         HttpExecutor httpExecutor = new HttpExecutor();
         HttpResponse response = httpExecutor.performRequest(request);
