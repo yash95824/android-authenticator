@@ -317,6 +317,13 @@ public class XWikiHttp {
      * the SyncData can be used in updating the data.
      * @throws IOException
      * @throws XmlPullParserException
+     *
+     *  ", BaseObject as userObj , XWikiDocument as groupDoc , BaseObject as groupObj , com.xpn.xwiki.objects.StringProperty as groupObj_member1 " +
+        "where ( (groupObj_member1.value = doc.fullName or groupObj_member1.value = CONCAT('xwiki:', doc.fullName)) and groupDoc.fullName = 'XWiki."+ split[2] + "' ) " +
+        "and doc.fullName=userObj.name and userObj.className='XWiki.XWikiUsers' " +
+        "and groupDoc.fullName=groupObj.name and groupObj.className='XWiki.XWikiGroups' " +
+        "and groupObj_member1.id.id=groupObj.id and groupObj_member1.id.name='member' &type=hql
+     *
      */
     private static SyncData getSyncGroups(List<String> groupIdList, String lastSyncTime) throws IOException, XmlPullParserException {
         if (groupIdList == null || groupIdList.size() == 0) return null;
@@ -327,17 +334,11 @@ public class XWikiHttp {
             if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
             String url = getServerRestUrl() + "/wikis/xwiki/query?q=" +
                     ",%20BaseObject%20as%20userObj%20,%20XWikiDocument%20as%20groupDoc%20,%20BaseObject%20as%20groupObj%20,%20com.xpn.xwiki.objects.StringProperty%20as%20groupObj_member1%20" +
-                    "where%20(%20groupObj_member1.value%20=%20doc.fullName%20and%20groupDoc.fullName%20=%20%27XWiki." + split[2] + "%27%20)%20" +
+                    "where%20((%20groupObj_member1.value%20=%20doc.fullName%20or%20groupObj_member1.value%20=%20CONCAT(%27xwiki:%27,doc.fullName))%20and%20groupDoc.fullName%20=%20%27XWiki." + split[2] + "%27%20)%20" +
                     "and%20doc.fullName=userObj.name%20and%20userObj.className=%27XWiki.XWikiUsers%27%20" +
                     "and%20groupDoc.fullName=groupObj.name%20and%20groupObj.className=%27XWiki.XWikiGroups%27%20" +
                     "and%20groupObj_member1.id.id=groupObj.id%20and%20groupObj_member1.id.name=%27member%27%20&type=hql";
 
-//            String url = getServerRestUrl() + "/wikis/xwiki/query?q=" +
-//                    ", BaseObject as userObj , XWikiDocument as groupDoc , BaseObject as groupObj , com.xpn.xwiki.objects.StringProperty as groupObj_member1 " +
-//                    "where ( groupObj_member1.value = doc.fullName and groupDoc.fullName = 'XWiki."+ split[2] + "' ) " +
-//                    "and doc.fullName=userObj.name and userObj.className='XWiki.XWikiUsers' " +
-//                    "and groupDoc.fullName=groupObj.name and groupObj.className='XWiki.XWikiGroups' " +
-//                    "and groupObj_member1.id.id=groupObj.id and groupObj_member1.id.name='member' &type=hql";
             HttpRequest request = new HttpRequest(url);
             HttpExecutor httpExecutor = new HttpExecutor();
             HttpResponse response = httpExecutor.performRequest(request);
