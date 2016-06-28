@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
+import org.json.JSONException;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
@@ -95,7 +96,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (final IOException e) {
             Log.e(TAG, "IOException", e);
             syncResult.stats.numIoExceptions++;
-        } catch (XmlPullParserException e) {
+        } catch (JSONException e) {
             Log.e(TAG, "XmlPullParserException", e);
             syncResult.stats.numParseExceptions++;
         }

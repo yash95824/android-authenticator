@@ -111,7 +111,7 @@ public class StringUtils {
         //TODO it's a problem
         // in android need "yyyy-MM-dd'T'HH:mm:ssZ"
         // in junit4 need  "yyyy-MM-dd'T'HH:mm:ssX" iso8601
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             return sdf.parse(iso8601);
@@ -129,7 +129,7 @@ public class StringUtils {
      * @return String
      */
     public static String dateToIso8601String(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         return sdf.format(date);
     }

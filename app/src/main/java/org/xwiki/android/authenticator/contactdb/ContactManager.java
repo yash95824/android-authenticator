@@ -38,6 +38,7 @@ import android.provider.ContactsContract.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
@@ -105,7 +106,7 @@ public class ContactManager {
      * sync request.
      */
     public static synchronized void updateContacts(Context context, String account,
-                                                   XWikiHttp.SyncData syncData) throws IOException, XmlPullParserException {
+                                                   XWikiHttp.SyncData syncData) throws IOException, JSONException {
 
 
         // Make sure that the XWiki group exists

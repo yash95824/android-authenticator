@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -161,10 +162,7 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                 XWikiUser userFind = null;
                 try {
                     userFind = XWikiHttp.getUserDetail("xwiki", "XWiki", userId);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                } catch (XmlPullParserException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }

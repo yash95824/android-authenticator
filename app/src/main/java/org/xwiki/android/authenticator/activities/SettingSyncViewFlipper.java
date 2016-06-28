@@ -41,6 +41,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
@@ -154,7 +155,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (XmlPullParserException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 return false;

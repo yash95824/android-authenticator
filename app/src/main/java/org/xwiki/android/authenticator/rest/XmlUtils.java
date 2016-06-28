@@ -29,6 +29,7 @@ import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -43,10 +44,11 @@ public class XmlUtils {
     /**
      * Get SearchResults from XML
      *
-     * @param inStream from XML (byte->inStream)
+     * @param bytes from XML (byte->inStream)
      * @return List<SearchResult>
      */
-    public static List<SearchResult> getSearchResults(InputStream inStream) throws IOException, XmlPullParserException {
+    public static List<SearchResult> getSearchResults(byte[] bytes) throws IOException, XmlPullParserException {
+        ByteArrayInputStream inStream = new ByteArrayInputStream(bytes);
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(inStream, "UTF-8");
         int eventType = parser.getEventType();
@@ -102,10 +104,11 @@ public class XmlUtils {
     /**
      * get XWikiUser from server's response xml.
      *
-     * @param inStream xml byte->InputStream
+     * @param bytes xml byte->InputStream
      * @return XWikiUser
      */
-    public static XWikiUser getXWikiUser(InputStream inStream) throws IOException, XmlPullParserException {
+    public static XWikiUser getXWikiUser(byte[] bytes) throws IOException, XmlPullParserException {
+        ByteArrayInputStream inStream = new ByteArrayInputStream(bytes);
         XmlPullParser parser = Xml.newPullParser();
         parser.setInput(inStream, "UTF-8");
         int eventType = parser.getEventType();
